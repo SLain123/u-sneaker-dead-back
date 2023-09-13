@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { RunService } from './run.service';
 
-@Module({})
+@Module({
+  providers: [RunService]
+})
 export class RunModule {}
