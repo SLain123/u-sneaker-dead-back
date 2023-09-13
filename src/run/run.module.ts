@@ -1,7 +1,11 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
 import { RunService } from './run.service';
+import { Run, RunSchema } from './model/run.model';
 
 @Module({
-  providers: [RunService]
+  providers: [RunService],
+  imports: [MongooseModule.forFeature([{ name: Run.name, schema: RunSchema }])],
 })
 export class RunModule {}
