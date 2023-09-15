@@ -6,9 +6,6 @@ export type ShoeDocument = HydratedDocument<Shoe>;
 @Schema()
 export class Shoe {
   @Prop({ required: true })
-  _id: string;
-
-  @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })

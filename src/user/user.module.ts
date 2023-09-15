@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { UserService } from './user.service';
-import { User, UserSchema } from './model/user.model';
+import { User, UserSchema } from './user.model';
 
-import { Shoe, ShoeSchema } from '../shoe/model/shoe.model';
-import { Run, RunSchema } from '../run/model/run.model';
+import { Shoe, ShoeSchema } from '../shoe/shoe.model';
+import { Run, RunSchema } from '../run/run.model';
 
 @Module({
   providers: [UserService],

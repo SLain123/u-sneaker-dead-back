@@ -1,15 +1,12 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MSchema } from 'mongoose';
 
-import { Shoe } from '../../shoe/model/shoe.model';
+import { Shoe } from '../shoe/shoe.model';
 
 export type RunDocument = HydratedDocument<Run>;
 
 @Schema()
 export class Run {
-  @Prop({ required: true })
-  _id: string;
-
   @Prop({ required: true })
   trDate: Date;
 

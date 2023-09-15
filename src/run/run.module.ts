@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { RunService } from './run.service';
-import { Run, RunSchema } from './model/run.model';
+import { Run, RunSchema } from './run.model';
 
 @Module({
   providers: [RunService],

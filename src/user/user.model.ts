@@ -1,8 +1,8 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MSchema } from 'mongoose';
 
-import { Shoe } from '../../shoe/model/shoe.model';
-import { Run } from '../../run/model/run.model';
+import { Shoe } from '../shoe/shoe.model';
+import { Run } from '../run/run.model';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -17,10 +17,7 @@ export enum LangType {
 
 @Schema()
 export class User {
-  @Prop({ required: true })
-  _id: string;
-
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   email: string;
 
   @Prop({ required: true })
@@ -29,7 +26,7 @@ export class User {
   @Prop()
   nick?: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, min: 40, max: 200 })
   weight: number;
 
   @Prop()
