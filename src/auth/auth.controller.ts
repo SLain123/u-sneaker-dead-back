@@ -4,6 +4,8 @@ import {
   Controller,
   HttpCode,
   Post,
+  Get,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -14,6 +16,9 @@ import { AuthDto } from './auth.dto';
 
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
+import { UserIndentifaer } from '../user/user.dto';
+import { JwtAuthGuard } from '../global/guards/jwt.guard';
+import { UserData } from '../global/decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -44,5 +49,12 @@ export class AuthController {
     );
 
     return await this.authService.login({ userId: String(userId), userEmail });
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Get('check')
+  async check(@UserData() userData: UserIndentifaer) {
+    return userData;
   }
 }
