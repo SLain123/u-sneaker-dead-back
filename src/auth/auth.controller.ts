@@ -43,6 +43,6 @@ export class AuthController {
       password,
     );
 
-    return await this.authService.login(String(userId), userEmail);
+    return await this.authService.login({ userId: String(userId), userEmail });
   }
 }

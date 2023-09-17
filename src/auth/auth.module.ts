@@ -2,12 +2,14 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 import { User, UserSchema } from '../user/user.model';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 
 @Module({
   imports: [
@@ -24,8 +26,10 @@ import { UserService } from 'src/user/user.service';
         };
       },
     }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    ConfigModule,
   ],
-  providers: [AuthService, UserService],
+  providers: [AuthService, UserService, JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
