@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { genSalt, hash, compare } from 'bcryptjs';
 
 import { User } from './user.model';
+import { UserDto } from './user.dto';
 
 import { USER_ERRS } from '../global/errors';
 
@@ -13,7 +14,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  async createUser(dto: Omit<User, '_id'>) {
+  async createUser(dto: UserDto) {
     const { email, password, weight, nick = '' } = dto;
     const salt = await genSalt(10);
     const newUser = new this.userModel({
@@ -24,6 +25,15 @@ export class UserService {
     });
 
     return newUser.save();
+  }
+
+  async removeUser(email: string) {
+    const user = await this.userModel.findOneAndRemove({ email }).exec();
+    if (!user) {
+      throw new UnauthorizedException(USER_ERRS.userNotExist);
+    }
+
+    return user;
   }
 
   async findUser(email: string) {
