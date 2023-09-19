@@ -33,6 +33,20 @@ describe('AuthController (e2e)', () => {
       .expect(201);
   });
 
+  it('/auth/register (POST) - fail (user already exist)', () => {
+    return request(app.getHttpServer())
+      .post('/auth/register')
+      .send(testUserDto)
+      .expect(400);
+  });
+
+  it('/auth/register (POST) - fail (wrong weight)', () => {
+    return request(app.getHttpServer())
+      .post('/auth/register')
+      .send({ ...testUserDto, email: 'test@testwrong.ru', weight: 10 })
+      .expect(400);
+  });
+
   it('/auth/login (POST) - success', async () => {
     return request(app.getHttpServer())
       .post('/auth/login')
@@ -42,6 +56,13 @@ describe('AuthController (e2e)', () => {
         expect(body.access_token).toBeDefined();
         token = body.access_token;
       });
+  });
+
+  it('/auth/login (POST) - fail (wrong password)', () => {
+    return request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ testUserDto, password: '12345678' })
+      .expect(400);
   });
 
   it('/auth/check (GET) - success', async () => {
@@ -54,6 +75,13 @@ describe('AuthController (e2e)', () => {
       });
   });
 
+  it('/auth/check (GET) - fail (bad token)', () => {
+    return request(app.getHttpServer())
+      .get('/auth/check')
+      .set('Authorization', `Bearer ${token}123`)
+      .expect(401);
+  });
+
   it('/auth/user/remove (DELETE) - success', async () => {
     return request(app.getHttpServer())
       .delete('/auth/user/remove')
@@ -62,6 +90,13 @@ describe('AuthController (e2e)', () => {
       .then(({ body }) => {
         expect(body.email).toEqual(testUserDto.email);
       });
+  });
+
+  it('/auth/user/remove (DELETE) - fail (user does not exist)', () => {
+    return request(app.getHttpServer())
+      .delete('/auth/user/remove')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(401);
   });
 
   afterAll(() => {
