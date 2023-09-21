@@ -2,6 +2,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MSchema } from 'mongoose';
 
 import { Shoe } from '../shoe/shoe.model';
+import { User } from '../user/user.model';
 
 export type RunDocument = HydratedDocument<Run>;
 
@@ -14,7 +15,10 @@ export class Run {
   trDistance: number;
 
   @Prop({ type: MSchema.Types.ObjectId, ref: Shoe.name })
-  shoeId: Shoe;
+  shoe: Shoe;
+
+  @Prop({ type: MSchema.Types.ObjectId, ref: 'User' })
+  user: User;
 }
 
 export const RunSchema = SchemaFactory.createForClass(Run);

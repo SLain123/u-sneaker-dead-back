@@ -1,4 +1,15 @@
-import { IsEmail, IsNumber, IsString, Length, Min, Max } from 'class-validator';
+import {
+  IsEmail,
+  IsNumber,
+  IsString,
+  Length,
+  Min,
+  Max,
+  IsOptional,
+  IsEnum,
+} from 'class-validator';
+
+import { ThemeType, LangType } from './user.model';
 
 export class UserIndentifaer {
   userId: string;
@@ -18,5 +29,17 @@ export class UserDto {
   @Max(200)
   weight: number;
 
+  @IsString()
+  @IsOptional()
   nick?: string;
+}
+
+export class UserFullDto extends UserDto {
+  @IsEnum(ThemeType)
+  @IsOptional()
+  theme?: ThemeType;
+
+  @IsEnum(LangType)
+  @IsOptional()
+  lang?: LangType;
 }

@@ -4,9 +4,10 @@ import { Model } from 'mongoose';
 import { genSalt, hash, compare } from 'bcryptjs';
 
 import { User } from './user.model';
-import { UserDto } from './user.dto';
+import { UserDto, UserFullDto } from './user.dto';
 
 import { USER_ERRS } from '../global/errors';
+import { ShoeDto } from '../shoe/shoe.dto';
 
 @Injectable()
 export class UserService {
@@ -52,5 +53,25 @@ export class UserService {
     }
 
     return { userEmail: user.email, userId: user._id };
+  }
+
+  async updateUser(email: string, dto: Partial<UserFullDto>) {
+    return this.userModel
+      .findOneAndUpdate({ email }, dto, { new: true })
+      .exec();
+  }
+
+  async updateUserDataList(
+    email: string,
+    listName: 'shoeList' | 'runList',
+    list: ShoeDto,
+  ) {
+    return this.userModel
+      .findOneAndUpdate(
+        { email },
+        { $push: { [listName]: list } },
+        { new: true },
+      )
+      .exec();
   }
 }

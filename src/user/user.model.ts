@@ -35,10 +35,10 @@ export class User {
   @Prop()
   lang?: LangType;
 
-  @Prop({ type: MSchema.Types.ObjectId, ref: Shoe.name })
+  @Prop([{ type: MSchema.Types.ObjectId, ref: 'Shoe' }])
   shoeList: Shoe[];
 
-  @Prop({ type: MSchema.Types.ObjectId, ref: Run.name })
+  @Prop([{ type: MSchema.Types.ObjectId, ref: 'Run' }])
   runList: Run[];
 }
 

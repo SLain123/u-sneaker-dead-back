@@ -1,5 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Schema as MSchema } from 'mongoose';
+
+import { User } from '../user/user.model';
 
 export type ShoeDocument = HydratedDocument<Shoe>;
 
@@ -19,6 +21,9 @@ export class Shoe {
 
   @Prop({ required: true })
   totalDurability: number;
+
+  @Prop({ type: MSchema.Types.ObjectId, ref: 'User' })
+  user: User;
 }
 
 export const ShoeSchema = SchemaFactory.createForClass(Shoe);
