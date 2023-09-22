@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
-import { UserIndentifaer, UserChangeDto } from './user.dto';
+import { UserIndentifaer, UpdateUserDTO } from './user.dto';
 
 import { JwtAuthGuard } from '../global/guards/jwt.guard';
 import { UserData } from '../global/decorators/user.decorator';
@@ -32,7 +32,7 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   @Patch('')
   async updateUser(
-    @Body() dto: UserChangeDto,
+    @Body() dto: UpdateUserDTO,
     @UserData() { userEmail }: UserIndentifaer,
   ) {
     return this.userService.updateUser(userEmail, dto);

@@ -8,8 +8,13 @@ import {
   IsOptional,
   IsEnum,
 } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 import { ThemeType, LangType } from './user.model';
+
+import { Shoe } from '../shoe/shoe.model';
+import { Run } from '../run/run.model';
 
 export class UserIndentifaer {
   userId: string;
@@ -34,22 +39,18 @@ export class UserDto {
   nick?: string;
 }
 
-export class UserChangeDto {
-  @IsNumber()
-  @Min(40)
-  @Max(200)
-  @IsOptional()
-  weight?: number;
-
-  @IsString()
-  @IsOptional()
-  nick?: string;
-
+export class UserFullDto extends UserDto {
   @IsEnum(ThemeType)
-  @IsOptional()
-  theme?: ThemeType;
+  theme: ThemeType;
 
   @IsEnum(LangType)
-  @IsOptional()
-  lang?: LangType;
+  lang: LangType;
+
+  @Type(() => Shoe)
+  shoeList: Shoe[];
+
+  @Type(() => Run)
+  runList: Run[];
 }
+
+export class UpdateUserDTO extends PartialType(UserFullDto) {}

@@ -1,13 +1,18 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { genSalt, hash, compare } from 'bcryptjs';
 
 import { User } from './user.model';
-import { UserDto, UserChangeDto } from './user.dto';
+import { UserDto, UpdateUserDTO } from './user.dto';
 
 import { USER_ERRS } from '../global/errors';
 import { ShoeDto } from '../shoe/shoe.dto';
+import { RunDto } from '../run/run.dto';
 
 @Injectable()
 export class UserService {
@@ -37,9 +42,9 @@ export class UserService {
     return user;
   }
 
-  async findUser(email: string, ignore = false) {
+  async findUser(email: string, ignoreExisting = false) {
     const user = await this.userModel.findOne({ email }).exec();
-    if (!user && !ignore) {
+    if (!user && !ignoreExisting) {
       throw new UnauthorizedException(USER_ERRS.userNotExist);
     }
 
@@ -71,23 +76,37 @@ export class UserService {
     return { userEmail: user.email, userId: user._id };
   }
 
-  async updateUser(email: string, dto: UserChangeDto) {
-    return this.userModel
+  async updateUser(email: string, dto: UpdateUserDTO) {
+    if (dto.email || dto.password || dto.shoeList || dto.runList) {
+      throw new BadRequestException(USER_ERRS.prohibitedData);
+    }
+
+    const updatedUser = await this.userModel
       .findOneAndUpdate({ email }, dto, { new: true })
       .exec();
+    if (!updatedUser) {
+      throw new UnauthorizedException(USER_ERRS.userNotExist);
+    }
+
+    return updatedUser;
   }
 
   async updateUserDataList(
     email: string,
     listName: 'shoeList' | 'runList',
-    list: ShoeDto,
+    list: ShoeDto | RunDto,
   ) {
-    return this.userModel
+    const updatedUser = await this.userModel
       .findOneAndUpdate(
         { email },
         { $push: { [listName]: list } },
         { new: true },
       )
       .exec();
+    if (!updatedUser) {
+      throw new UnauthorizedException(USER_ERRS.userNotExist);
+    }
+
+    return updatedUser;
   }
 }

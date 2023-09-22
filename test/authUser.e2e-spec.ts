@@ -14,6 +14,8 @@ const testUserDto: UserDto = {
 };
 
 describe('AuthUserControllers (e2e)', () => {
+  const fakeToken =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTBjMzE5YTk0NjFkNTRiYzQ3NTFkMDAiLCJ1c2VyRW1haWwiOiJzbDE2M0BoaC5ydSIsImlhdCI6MTY5NTI5Nzk1NiwiZXhwIjoxNjk1Mjk3OTU5fQ.zttsGwenZIWfZt0VHq5XmGTgR8ktWtq2WUa2h7EKtsc';
   let app: INestApplication;
   let token: string;
 
@@ -95,6 +97,49 @@ describe('AuthUserControllers (e2e)', () => {
       .get('/user')
       .set('Authorization', `Bearer ${token}123`)
       .expect(401);
+  });
+
+  it('/user (PATCH) - success', async () => {
+    const editedNick = 'edited nick';
+    return request(app.getHttpServer())
+      .patch('/user')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ testUserDto, nick: editedNick })
+      .expect(200)
+      .then(({ body }) => expect(body.nick).toBe(editedNick));
+  });
+
+  it('/user (PATCH) - fail (wrong user token)', () => {
+    const editedNick = 'edited nick';
+    return request(app.getHttpServer())
+      .patch('/user')
+      .set('Authorization', `Bearer ${fakeToken}`)
+      .send({ testUserDto, nick: editedNick })
+      .expect(401);
+  });
+
+  it('/user (PATCH) - fail (email changing)', () => {
+    return request(app.getHttpServer())
+      .patch('/user')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ testUserDto, email: 'test@edittest.com' })
+      .expect(400);
+  });
+
+  it('/user (PATCH) - fail (password changing)', () => {
+    return request(app.getHttpServer())
+      .patch('/user')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ testUserDto, password: 'new123new' })
+      .expect(400);
+  });
+
+  it('/user (PATCH) - fail (shoeList changing)', () => {
+    return request(app.getHttpServer())
+      .patch('/user')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ testUserDto, shoeList: [] })
+      .expect(400);
   });
 
   it('/user (DELETE) - success', async () => {

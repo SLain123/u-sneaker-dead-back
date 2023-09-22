@@ -5,6 +5,7 @@ export enum AUTH_ERRS {
 export enum USER_ERRS {
   userNotExist = 'User does not exist',
   uncorrectPassword = 'Password is not correct',
+  prohibitedData = 'Email, password or shoe/run lists prohibited for modification via this route',
 }
 
 export enum SHOE_ERRS {
