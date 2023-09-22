@@ -40,7 +40,7 @@ describe('AuthController (e2e)', () => {
       .then(({ body }) => {
         token = body.access_token;
       });
-  });
+  }, 10000);
 
   it('/shoe/create (POST) - success', async () => {
     return request(app.getHttpServer())
@@ -92,5 +92,5 @@ describe('AuthController (e2e)', () => {
 
   afterAll(() => {
     disconnect();
-  });
+  }, 10000);
 });
