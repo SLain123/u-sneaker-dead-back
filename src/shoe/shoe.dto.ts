@@ -7,6 +7,7 @@ import {
   IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
 
 export class ShoeDto {
   @IsString()
@@ -30,3 +31,5 @@ export class ShoeDto {
   @Type(() => Date)
   purchaseDate: Date;
 }
+
+export class UpdateShoeDTO extends PartialType(ShoeDto) {}

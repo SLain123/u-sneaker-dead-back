@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { genSalt, hash, compare } from 'bcryptjs';
 
 import { User } from './user.model';
-import { UserDto, UserFullDto } from './user.dto';
+import { UserDto, UserChangeDto } from './user.dto';
 
 import { USER_ERRS } from '../global/errors';
 import { ShoeDto } from '../shoe/shoe.dto';
@@ -37,8 +37,24 @@ export class UserService {
     return user;
   }
 
-  async findUser(email: string) {
-    return this.userModel.findOne({ email }).exec();
+  async findUser(email: string, ignore = false) {
+    const user = await this.userModel.findOne({ email }).exec();
+    if (!user && !ignore) {
+      throw new UnauthorizedException(USER_ERRS.userNotExist);
+    }
+
+    return user;
+  }
+
+  async getFullUserData(email: string) {
+    const user = await this.userModel
+      .findOne({ email })
+      .populate(['shoeList', 'runList']);
+    if (!user) {
+      throw new UnauthorizedException(USER_ERRS.userNotExist);
+    }
+
+    return user; //TODO: check runList
   }
 
   async validateUser(email: string, password: string) {
@@ -55,7 +71,7 @@ export class UserService {
     return { userEmail: user.email, userId: user._id };
   }
 
-  async updateUser(email: string, dto: Partial<UserFullDto>) {
+  async updateUser(email: string, dto: UserChangeDto) {
     return this.userModel
       .findOneAndUpdate({ email }, dto, { new: true })
       .exec();

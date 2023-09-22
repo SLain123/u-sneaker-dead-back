@@ -6,6 +6,7 @@ import { User, UserSchema } from './user.model';
 
 import { Shoe, ShoeSchema } from '../shoe/shoe.model';
 import { Run, RunSchema } from '../run/run.model';
+import { UserController } from './user.controller';
 
 @Module({
   providers: [UserService],
@@ -16,5 +17,6 @@ import { Run, RunSchema } from '../run/run.model';
       { name: Shoe.name, schema: ShoeSchema },
     ]),
   ],
+  controllers: [UserController],
 })
 export class UserModule {}

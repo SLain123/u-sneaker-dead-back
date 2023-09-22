@@ -5,7 +5,6 @@ import {
   HttpCode,
   Post,
   Get,
-  Delete,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -30,7 +29,7 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   @Post('register')
   async register(@Body() dto: UserDto) {
-    const oldUser = await this.userService.findUser(dto.email);
+    const oldUser = await this.userService.findUser(dto.email, true);
     if (oldUser) {
       throw new BadRequestException(AUTH_ERRS.userExists);
     }
@@ -56,12 +55,5 @@ export class AuthController {
   @Get('check')
   async check(@UserData() userData: UserIndentifaer) {
     return userData;
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(200)
-  @Delete('user/remove')
-  async userRemove(@UserData() userData: UserIndentifaer) {
-    return this.userService.removeUser(userData?.userEmail);
   }
 }

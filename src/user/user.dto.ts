@@ -34,7 +34,17 @@ export class UserDto {
   nick?: string;
 }
 
-export class UserFullDto extends UserDto {
+export class UserChangeDto {
+  @IsNumber()
+  @Min(40)
+  @Max(200)
+  @IsOptional()
+  weight?: number;
+
+  @IsString()
+  @IsOptional()
+  nick?: string;
+
   @IsEnum(ThemeType)
   @IsOptional()
   theme?: ThemeType;

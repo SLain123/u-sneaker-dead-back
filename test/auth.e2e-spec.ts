@@ -82,9 +82,9 @@ describe('AuthController (e2e)', () => {
       .expect(401);
   });
 
-  it('/auth/user/remove (DELETE) - success', async () => {
+  it('/user (DELETE) - success', async () => {
     return request(app.getHttpServer())
-      .delete('/auth/user/remove')
+      .delete('/user')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .then(({ body }) => {
@@ -92,9 +92,9 @@ describe('AuthController (e2e)', () => {
       });
   });
 
-  it('/auth/user/remove (DELETE) - fail (user does not exist)', () => {
+  it('/user (DELETE) - fail (user does not exist)', () => {
     return request(app.getHttpServer())
-      .delete('/auth/user/remove')
+      .delete('/user')
       .set('Authorization', `Bearer ${token}`)
       .expect(401);
   });
