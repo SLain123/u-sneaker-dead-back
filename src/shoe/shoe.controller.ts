@@ -14,6 +14,7 @@ import { ShoeDto, UpdateShoeDTO } from './shoe.dto';
 
 import { JwtAuthGuard } from '../global/guards/jwt.guard';
 import { UserData } from '../global/decorators/user.decorator';
+import { IdValidationPipe } from '../global/pipes/id-validation.pipe';
 import { UserIndentifaer } from '../user/user.dto';
 import { ShoeService } from './shoe.service';
 
@@ -37,7 +38,7 @@ export class ShoeController {
   @Patch(':id')
   async updateUser(
     @Body() dto: UpdateShoeDTO,
-    @Param('id') id: string,
+    @Param('id', IdValidationPipe) id: string,
     @UserData() { userId }: UserIndentifaer,
   ) {
     return this.shoeService.updateShoe(userId, id, dto);
