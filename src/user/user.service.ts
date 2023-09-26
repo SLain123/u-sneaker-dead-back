@@ -91,17 +91,36 @@ export class UserService {
     return updatedUser;
   }
 
-  async updateUserDataList(
-    email: string,
-    listName: 'shoeList' | 'runList',
+  async extendUserDataList(
+    _id: string,
     list: ShoeDto | RunDto,
+    listName: 'shoeList' | 'runList',
   ) {
     const updatedUser = await this.userModel
-      .findOneAndUpdate(
-        { email },
+      .findByIdAndUpdate(
+        { _id },
         { $push: { [listName]: list } },
         { new: true },
       )
+      .exec();
+    if (!updatedUser) {
+      throw new UnauthorizedException(USER_ERRS.userNotExist);
+    }
+
+    return updatedUser;
+  }
+
+  async reduceUserDataList(
+    _id: string,
+    listIdForRemoving: string,
+    listName: 'shoeList' | 'runList',
+  ) {
+    const currentShoeList = (await this.userModel.findById(_id)).shoeList;
+    const updatedShoeList = currentShoeList.filter(
+      (shoe) => shoe.toString() !== listIdForRemoving,
+    );
+    const updatedUser = await this.userModel
+      .findOneAndUpdate({ _id }, { [listName]: updatedShoeList }, { new: true })
       .exec();
     if (!updatedUser) {
       throw new UnauthorizedException(USER_ERRS.userNotExist);
