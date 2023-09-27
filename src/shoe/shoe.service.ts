@@ -36,6 +36,11 @@ export class ShoeService {
     return shoe;
   }
 
+  async findAllUserShoe(userId: string) {
+    const shoeList = await this.shoeModel.find({ user: userId });
+    return shoeList;
+  }
+
   async checkShoeOwner(userId: string, shoeOwnerId: string) {
     if (userId !== shoeOwnerId) {
       throw new UnauthorizedException(SHOE_ERRS.shoeNoBelongUser);

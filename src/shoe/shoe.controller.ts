@@ -9,6 +9,7 @@ import {
   Patch,
   Param,
   Delete,
+  Get,
 } from '@nestjs/common';
 
 import { ShoeDto, UpdateShoeDTO } from './shoe.dto';
@@ -31,6 +32,14 @@ export class ShoeController {
     @UserData() { userEmail }: UserIndentifaer,
   ) {
     return this.shoeService.createShoe(userEmail, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @UsePipes(new ValidationPipe())
+  @Get('')
+  async getAllUserShoes(@UserData() { userId }: UserIndentifaer) {
+    return this.shoeService.findAllUserShoe(userId);
   }
 
   @UseGuards(JwtAuthGuard)

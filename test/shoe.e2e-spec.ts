@@ -77,6 +77,14 @@ describe('AuthController (e2e)', () => {
       .expect(400);
   });
 
+  it('/shoe (GET) - success', async () => {
+    return request(app.getHttpServer())
+      .get('/shoe')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body).toHaveLength(1));
+  });
+
   it('/shoe (PATCH) - success', async () => {
     const editedName = 'sneakers-test-edited';
     return request(app.getHttpServer())
