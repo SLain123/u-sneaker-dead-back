@@ -2,6 +2,8 @@ import { IsNumber, IsString, Min, Max, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
 
+import { Shoe } from '../shoe/shoe.model';
+
 export class RunDto {
   @IsDate()
   @Type(() => Date)
@@ -16,4 +18,9 @@ export class RunDto {
   shoeId: string;
 }
 
-export class UpdateRunDTO extends PartialType(RunDto) {}
+export class RunDtoFull extends RunDto {
+  @IsString()
+  shoe: Shoe;
+}
+
+export class UpdateRunDTO extends PartialType(RunDtoFull) {}

@@ -14,7 +14,7 @@ export class IdValidationPipe implements PipeTransform {
     }
 
     if (!Types.ObjectId.isValid(value)) {
-      throw new BadRequestException('The passed _id is not valid');
+      throw new BadRequestException('The passed id is not valid');
     }
 
     return value;
