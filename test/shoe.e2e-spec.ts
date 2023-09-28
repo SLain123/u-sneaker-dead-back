@@ -14,7 +14,7 @@ const testUserDto: AuthDto = {
 
 const testShoeDto: ShoeDto = {
   name: 'sneakers-test',
-  durability: 0,
+  initDurability: 0,
   totalDurability: 3000,
   purchaseDate: new Date('1989-07-20'),
 };
@@ -101,7 +101,7 @@ describe('AuthController (e2e)', () => {
     return request(app.getHttpServer())
       .patch(`/shoe/${shoeId}`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ durability: 99999 })
+      .send({ initDurability: 99999 })
       .expect(400);
   });
 

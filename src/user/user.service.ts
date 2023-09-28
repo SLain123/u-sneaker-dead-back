@@ -11,8 +11,8 @@ import { User } from './user.model';
 import { UserDto, UpdateUserDTO } from './user.dto';
 
 import { USER_ERRS } from '../global/errors';
-import { ShoeDto } from '../shoe/shoe.dto';
-import { RunDto } from '../run/run.dto';
+import { Run } from '../run/run.model';
+import { Shoe } from '../shoe/shoe.model';
 
 @Injectable()
 export class UserService {
@@ -51,17 +51,6 @@ export class UserService {
     return user;
   }
 
-  async getFullUserData(email: string) {
-    const user = await this.userModel
-      .findOne({ email })
-      .populate(['shoeList', 'runList']);
-    if (!user) {
-      throw new UnauthorizedException(USER_ERRS.userNotExist);
-    }
-
-    return user; //TODO: check runList
-  }
-
   async validateUser(email: string, password: string) {
     const user = await this.findUser(email);
     if (!user) {
@@ -93,7 +82,7 @@ export class UserService {
 
   async extendUserDataList(
     _id: string,
-    list: ShoeDto | RunDto,
+    list: Shoe | Run,
     listName: 'shoeList' | 'runList',
   ) {
     const updatedUser = await this.userModel
@@ -112,12 +101,12 @@ export class UserService {
 
   async reduceUserDataList(
     _id: string,
-    listIdForRemoving: string,
+    itemIdForRemoving: string,
     listName: 'shoeList' | 'runList',
   ) {
     const currentShoeList = (await this.userModel.findById(_id)).shoeList;
     const updatedShoeList = currentShoeList.filter(
-      (shoe) => shoe.toString() !== listIdForRemoving,
+      (shoe) => shoe.toString() !== itemIdForRemoving,
     );
     const updatedUser = await this.userModel
       .findOneAndUpdate({ _id }, { [listName]: updatedShoeList }, { new: true })

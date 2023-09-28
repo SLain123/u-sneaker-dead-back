@@ -1,6 +1,6 @@
 import { IsNumber, IsString, Min, Max, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
-// import { PartialType } from '@nestjs/swagger';
+import { PartialType } from '@nestjs/swagger';
 
 export class RunDto {
   @IsDate()
@@ -15,3 +15,5 @@ export class RunDto {
   @IsString()
   shoeId: string;
 }
+
+export class UpdateRunDTO extends PartialType(RunDto) {}

@@ -21,7 +21,11 @@ export class ShoeService {
 
   async createShoe(email: string, dto: ShoeDto) {
     const user = await this.userService.findUser(email);
-    const newShoe = new this.shoeModel({ ...dto, user });
+    const newShoe = new this.shoeModel({
+      ...dto,
+      currentDurability: dto.initDurability,
+      user,
+    });
     this.userService.extendUserDataList(String(user._id), newShoe, 'shoeList');
 
     return newShoe.save();
@@ -36,7 +40,7 @@ export class ShoeService {
     return shoe;
   }
 
-  async findAllUserShoe(userId: string) {
+  async findAllUserShoes(userId: string) {
     const shoeList = await this.shoeModel.find({ user: userId });
     return shoeList;
   }
@@ -60,5 +64,9 @@ export class ShoeService {
 
     await this.userService.reduceUserDataList(userId, shoeId, 'shoeList');
     return this.shoeModel.findByIdAndRemove(shoeId).exec();
+  }
+
+  async calculateDurability() {
+    return true;
   }
 }

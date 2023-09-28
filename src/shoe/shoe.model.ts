@@ -17,7 +17,10 @@ export class Shoe {
   desc?: string;
 
   @Prop({ required: true })
-  durability: number;
+  initDurability: number;
+
+  @Prop({ required: true })
+  currentDurability: number;
 
   @Prop({ required: true })
   totalDurability: number;

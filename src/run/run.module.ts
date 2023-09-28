@@ -6,9 +6,13 @@ import { Run, RunSchema } from './run.model';
 
 import { User, UserSchema } from '../user/user.model';
 import { Shoe, ShoeSchema } from '../shoe/shoe.model';
+import { RunController } from './run.controller';
+
+import { ShoeService } from '../shoe/shoe.service';
+import { UserService } from '../user/user.service';
 
 @Module({
-  providers: [RunService],
+  providers: [RunService, ShoeService, UserService],
   imports: [
     MongooseModule.forFeature([
       { name: Run.name, schema: RunSchema },
@@ -16,5 +20,6 @@ import { Shoe, ShoeSchema } from '../shoe/shoe.model';
       { name: Shoe.name, schema: ShoeSchema },
     ]),
   ],
+  controllers: [RunController],
 })
 export class RunModule {}

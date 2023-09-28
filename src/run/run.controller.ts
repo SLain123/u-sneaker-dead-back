@@ -12,56 +12,56 @@ import {
   Get,
 } from '@nestjs/common';
 
-import { ShoeDto, UpdateShoeDTO } from './shoe.dto';
-import { ShoeService } from './shoe.service';
+import { RunService } from './run.service';
+import { RunDto, UpdateRunDTO } from './run.dto';
 
 import { JwtAuthGuard } from '../global/guards/jwt.guard';
 import { UserData } from '../global/decorators/user.decorator';
 import { IdValidationPipe } from '../global/pipes/id-validation.pipe';
 import { UserIndentifaer } from '../user/user.dto';
 
-@Controller('shoe')
-export class ShoeController {
-  constructor(private readonly shoeService: ShoeService) {}
+@Controller('run')
+export class RunController {
+  constructor(private readonly runService: RunService) {}
 
   @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('create')
   async create(
-    @Body() dto: ShoeDto,
+    @Body() dto: RunDto,
     @UserData() { userEmail }: UserIndentifaer,
   ) {
-    return this.shoeService.createShoe(userEmail, dto);
+    return this.runService.createRun(userEmail, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @Get('')
-  async getAllUserShoes(@UserData() { userId }: UserIndentifaer) {
-    return this.shoeService.findAllUserShoes(userId);
+  async getAllUserRuns(@UserData() { userId }: UserIndentifaer) {
+    return this.runService.findAllUserRuns(userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @Patch(':id')
-  async updateShoe(
-    @Body() dto: UpdateShoeDTO,
+  async updateRun(
+    @Body() dto: UpdateRunDTO,
     @Param('id', IdValidationPipe) id: string,
     @UserData() { userId }: UserIndentifaer,
   ) {
-    return this.shoeService.updateShoe(userId, id, dto);
+    return this.runService.updateRun(userId, id, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @Delete(':id')
-  async removeShoe(
+  async removeRun(
     @Param('id', IdValidationPipe) id: string,
     @UserData() { userId }: UserIndentifaer,
   ) {
-    return this.shoeService.removeShoe(userId, id);
+    return this.runService.removeRun(userId, id);
   }
 }

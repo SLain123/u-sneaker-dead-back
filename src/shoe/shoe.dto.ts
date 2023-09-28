@@ -20,7 +20,7 @@ export class ShoeDto {
   @IsNumber()
   @Min(0)
   @Max(9999)
-  durability: number;
+  initDurability: number;
 
   @IsNumber()
   @Min(100)

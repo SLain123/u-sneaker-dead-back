@@ -12,3 +12,8 @@ export enum SHOE_ERRS {
   shoeNotExist = 'Shoe does not exist',
   shoeNoBelongUser = 'Shoe belongs to another user',
 }
+
+export enum RUN_ERRS {
+  runNotExist = 'Run does not exist',
+  runNoBelongUser = 'Run belongs to another user',
+}
