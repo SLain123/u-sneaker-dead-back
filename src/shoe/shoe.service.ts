@@ -52,6 +52,10 @@ export class ShoeService {
   }
 
   async updateShoe(userId: string, shoeId: string, dto: UpdateShoeDTO) {
+    if (dto.currentDurability) {
+      throw new BadRequestException(SHOE_ERRS.shoeDurability);
+    }
+
     const shoe = await this.findShoe(shoeId);
     await this.checkShoeOwner(userId, String(shoe.user));
 

@@ -11,6 +11,7 @@ export enum USER_ERRS {
 export enum SHOE_ERRS {
   shoeNotExist = 'Shoe does not exist',
   shoeNoBelongUser = 'Shoe belongs to another user',
+  shoeDurability = 'Field current durability forbinned for changing',
 }
 
 export enum RUN_ERRS {

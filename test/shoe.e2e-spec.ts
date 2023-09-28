@@ -97,11 +97,19 @@ describe('AuthController (e2e)', () => {
       });
   });
 
-  it('/shoe (PATCH) - fail (wrong durability) ', () => {
+  it('/shoe (PATCH) - fail (wrong init durability) ', () => {
     return request(app.getHttpServer())
       .patch(`/shoe/${shoeId}`)
       .set('Authorization', `Bearer ${token}`)
       .send({ initDurability: 99999 })
+      .expect(400);
+  });
+
+  it('/shoe (PATCH) - fail (attempts current durability change)', () => {
+    return request(app.getHttpServer())
+      .patch(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ currentDurability: 99 })
       .expect(400);
   });
 

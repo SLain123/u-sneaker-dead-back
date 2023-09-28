@@ -32,4 +32,11 @@ export class ShoeDto {
   purchaseDate: Date;
 }
 
-export class UpdateShoeDTO extends PartialType(ShoeDto) {}
+export class ShoeDtoFull extends ShoeDto {
+  @IsNumber()
+  @Min(0)
+  @Max(9999)
+  currentDurability: number;
+}
+
+export class UpdateShoeDTO extends PartialType(ShoeDtoFull) {}
