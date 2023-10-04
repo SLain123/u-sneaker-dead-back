@@ -104,12 +104,12 @@ export class UserService {
     itemIdForRemoving: string,
     listName: 'shoeList' | 'runList',
   ) {
-    const currentShoeList = (await this.userModel.findById(_id)).shoeList;
-    const updatedShoeList = currentShoeList.filter(
-      (shoe) => shoe.toString() !== itemIdForRemoving,
+    const currentList = (await this.userModel.findById(_id))[listName];
+    const updatedList = currentList.filter(
+      (item) => item.toString() !== itemIdForRemoving,
     );
     const updatedUser = await this.userModel
-      .findOneAndUpdate({ _id }, { [listName]: updatedShoeList }, { new: true })
+      .findOneAndUpdate({ _id }, { [listName]: updatedList }, { new: true })
       .exec();
     if (!updatedUser) {
       throw new UnauthorizedException(USER_ERRS.userNotExist);

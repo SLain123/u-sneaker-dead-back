@@ -8,7 +8,7 @@ import { AuthDto } from '../src/auth/auth.dto';
 import { ShoeDto } from '../src/shoe/shoe.dto';
 
 const testUserDto: AuthDto = {
-  email: 'supertest@test.ru',
+  email: 'supertest@shoe.ru',
   password: '123456',
 };
 
@@ -30,7 +30,7 @@ describe('AuthController (e2e)', () => {
   let token: string;
   let shoeId: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -44,7 +44,7 @@ describe('AuthController (e2e)', () => {
       .then(({ body }) => {
         token = body.access_token;
       });
-  }, 10000);
+  });
 
   it('/shoe/create (POST) - success', async () => {
     await request(app.getHttpServer())
@@ -155,5 +155,5 @@ describe('AuthController (e2e)', () => {
 
   afterAll(() => {
     disconnect();
-  }, 10000);
+  });
 });
