@@ -32,11 +32,12 @@ const wait = async (time = 1000) =>
 describe('AuthController (e2e)', () => {
   const fakeToken =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTBjMzE5YTk0NjFkNTRiYzQ3NTFkMDAiLCJ1c2VyRW1haWwiOiJzbDE2M0BoaC5ydSIsImlhdCI6MTY5NTI5Nzk1NiwiZXhwIjoxNjk1Mjk3OTU5fQ.zttsGwenZIWfZt0VHq5XmGTgR8ktWtq2WUa2h7EKtsc';
-  const fakeShoeId = '6512d01295d02ddd8f79101f';
+  const fakeId = '6512d01295d02ddd8f79101f';
   let app: INestApplication;
   let token: string;
   let shoeId: string;
   let runId: string;
+  let secondShoeId: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -85,71 +86,123 @@ describe('AuthController (e2e)', () => {
       .then(({ body }) => expect(body.runList).toHaveLength(1));
   });
 
-  //   it('/shoe/create (POST) - fail (wrong purchase date)', () => {
-  //     return request(app.getHttpServer())
-  //       .post('/shoe/create')
-  //       .set('Authorization', `Bearer ${token}`)
-  //       .send({ ...testShoeDto, purchaseDate: new Date('1900-13-13') })
-  //       .expect(400);
-  //   });
+  it('/run/create (POST) - fail (wrong shoeId)', () => {
+    return request(app.getHttpServer())
+      .post('/run/create')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testRunDto, shoeId: fakeId })
+      .expect(400);
+  });
 
-  //   it('/shoe (GET) - success', async () => {
-  //     return request(app.getHttpServer())
-  //       .get('/shoe')
-  //       .set('Authorization', `Bearer ${token}`)
-  //       .expect(200)
-  //       .then(({ body }) => expect(body).toHaveLength(1));
-  //   });
+  it('/run (GET) - success', async () => {
+    return request(app.getHttpServer())
+      .get('/run')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body).toHaveLength(1));
+  });
 
-  //   it('/shoe (PATCH) - success', async () => {
-  //     const editedName = 'sneakers-test-edited';
-  //     return request(app.getHttpServer())
-  //       .patch(`/shoe/${shoeId}`)
-  //       .set('Authorization', `Bearer ${token}`)
-  //       .send({ name: editedName })
-  //       .expect(200)
-  //       .then(({ body }) => {
-  //         expect(body.name).toBe(editedName);
-  //       });
-  //   });
+  it('/run (PATCH) - success (distance change)', async () => {
+    const editedDistance = 100;
+    return request(app.getHttpServer())
+      .patch(`/run/${runId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ trDistance: editedDistance })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.trDistance).toBe(editedDistance);
+      });
+  });
 
-  //   it('/shoe (PATCH) - fail (wrong init durability) ', () => {
-  //     return request(app.getHttpServer())
-  //       .patch(`/shoe/${shoeId}`)
-  //       .set('Authorization', `Bearer ${token}`)
-  //       .send({ initDurability: 99999 })
-  //       .expect(400);
-  //   });
+  it('/shoe (PATCH) - success (shoe change) ', async () => {
+    await request(app.getHttpServer())
+      .post('/shoe/create')
+      .set('Authorization', `Bearer ${token}`)
+      .send(testShoeDto)
+      .then(({ body }) => {
+        secondShoeId = body._id;
+      });
 
-  //   it('/shoe (PATCH) - fail (attempts current durability change)', () => {
-  //     return request(app.getHttpServer())
-  //       .patch(`/shoe/${shoeId}`)
-  //       .set('Authorization', `Bearer ${token}`)
-  //       .send({ currentDurability: 99 })
-  //       .expect(400);
-  //   });
+    await request(app.getHttpServer())
+      .patch(`/run/${runId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ shoeId: secondShoeId })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.shoe).toBe(secondShoeId);
+      });
+  });
 
-  //   it('/shoe (PATCH) - fail (wrong shoe owner) ', () => {
-  //     return request(app.getHttpServer())
-  //       .patch(`/shoe/${shoeId}`)
-  //       .set('Authorization', `Bearer ${fakeToken}`)
-  //       .send({ name: 'new' })
-  //       .expect(401);
-  //   });
+  it('/run (PATCH) - fail (wrong shoeId) ', () => {
+    return request(app.getHttpServer())
+      .patch(`/run/${runId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ shoeId: fakeId })
+      .expect(400);
+  });
 
-  //   it('/shoe (DELETE) - fail (wrong shoe owner) ', () => {
-  //     return request(app.getHttpServer())
-  //       .delete(`/shoe/${shoeId}`)
-  //       .set('Authorization', `Bearer ${fakeToken}`)
-  //       .expect(401);
-  //   });
+  it('/shoe (PATCH) - fail (attempts shoe field instead of shoeId)', () => {
+    return request(app.getHttpServer())
+      .patch(`/run/${runId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ shoe: fakeId })
+      .expect(400);
+  });
 
-  //   it('/shoe (DELETE) - fail (wrong shoe id) ', () => {
-  //     return request(app.getHttpServer())
-  //       .delete(`/shoe/${fakeShoeId}`)
-  //       .set('Authorization', `Bearer ${token}`)
-  //       .expect(400);
-  //   });
+  it('/shoe (PATCH) - fail (wrong run owner) ', () => {
+    return request(app.getHttpServer())
+      .patch(`/run/${runId}`)
+      .set('Authorization', `Bearer ${fakeToken}`)
+      .send({ trDistance: 101 })
+      .expect(401);
+  });
+
+  it('/shoe (PATCH) - fail (wrong shoe owner) ', async () => {
+    let differentToken;
+    let differentShoeId;
+
+    await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({
+        email: 'supertest@shoe.ru',
+        password: '123456',
+      })
+      .then(({ body }) => {
+        differentToken = body.access_token;
+      });
+
+    await request(app.getHttpServer())
+      .post('/shoe/create')
+      .set('Authorization', `Bearer ${differentToken}`)
+      .send(testShoeDto)
+      .then(({ body }) => {
+        differentShoeId = body._id;
+      });
+
+    await request(app.getHttpServer())
+      .patch(`/run/${runId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ shoeId: differentShoeId })
+      .expect(401);
+
+    return request(app.getHttpServer())
+      .delete(`/shoe/${differentShoeId}`)
+      .set('Authorization', `Bearer ${differentToken}`);
+  });
+
+  it('/shoe (DELETE) - fail (wrong run owner) ', () => {
+    return request(app.getHttpServer())
+      .delete(`/run/${runId}`)
+      .set('Authorization', `Bearer ${fakeToken}`)
+      .expect(401);
+  });
+
+  it('/shoe (DELETE) - fail (wrong run id) ', () => {
+    return request(app.getHttpServer())
+      .delete(`/shoe/${fakeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(400);
+  });
 
   it('/run (DELETE) - success', async () => {
     await request(app.getHttpServer())
@@ -172,6 +225,10 @@ describe('AuthController (e2e)', () => {
   afterAll(async () => {
     await request(app.getHttpServer())
       .delete(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    await request(app.getHttpServer())
+      .delete(`/shoe/${secondShoeId}`)
       .set('Authorization', `Bearer ${token}`);
 
     disconnect();
