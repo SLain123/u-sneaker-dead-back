@@ -13,6 +13,7 @@ export enum SHOE_ERRS {
   shoeNoBelongUser = 'Shoe belongs to another user',
   shoeDurability = 'Field current durability forbinned for changing',
   shoeIdIncorrect = 'Shoe id is incorrect',
+  shoeCalculateError = 'Recalculation of currentDurability was unsuccessful',
 }
 
 export enum RUN_ERRS {

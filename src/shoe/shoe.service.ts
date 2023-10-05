@@ -4,18 +4,20 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { ShoeDto, UpdateShoeDTO } from './shoe.dto';
 import { Shoe } from './shoe.model';
 
 import { UserService } from '../user/user.service';
 import { SHOE_ERRS } from '../global/errors';
+import { Run } from '../run/run.model';
 
 @Injectable()
 export class ShoeService {
   constructor(
     @InjectModel(Shoe.name) private readonly shoeModel: Model<Shoe>,
+    @InjectModel(Run.name) private readonly runModel: Model<Run>,
     private readonly userService: UserService,
   ) {}
 
@@ -59,7 +61,11 @@ export class ShoeService {
     const shoe = await this.findShoe(shoeId);
     await this.checkShoeOwner(userId, String(shoe.user));
 
-    return this.shoeModel.findByIdAndUpdate(shoeId, dto, { new: true }).exec();
+    const updatedShoe = await this.shoeModel
+      .findByIdAndUpdate(shoeId, dto, { new: true })
+      .exec();
+
+    return updatedShoe;
   }
 
   async removeShoe(userId: string, shoeId: string) {
@@ -67,10 +73,44 @@ export class ShoeService {
     await this.checkShoeOwner(userId, String(shoe.user));
 
     await this.userService.reduceUserDataList(userId, shoeId, 'shoeList');
-    return this.shoeModel.findByIdAndRemove(shoeId).exec();
+    const removedShoe = await this.shoeModel.findByIdAndRemove(shoeId).exec();
+
+    return removedShoe;
   }
 
-  async calculateDurability() {
-    return true;
+  async calculateDurability(shoeId: string) {
+    const shoe = await this.findShoe(shoeId);
+    const calculatedRuns = (
+      await this.runModel.aggregate([
+        {
+          $match: { shoe: new Types.ObjectId(shoeId) },
+        },
+        {
+          $group: {
+            _id: '$shoe',
+            currentDurability: {
+              $sum: '$trDistance',
+            },
+          },
+        },
+      ])
+    )[0] as { currentDurability: number };
+
+    const currentDurability =
+      calculatedRuns.currentDurability + shoe.initDurability;
+    const recalculatedShoe = await this.shoeModel
+      .findOneAndUpdate(
+        { _id: shoeId },
+        {
+          currentDurability,
+        },
+      )
+      .exec();
+
+    if (!calculatedRuns || !recalculatedShoe) {
+      throw new BadRequestException(SHOE_ERRS.shoeCalculateError);
+    }
+
+    return { currentDurability };
   }
 }

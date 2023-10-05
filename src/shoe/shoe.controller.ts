@@ -51,7 +51,10 @@ export class ShoeController {
     @Param('id', IdValidationPipe) id: string,
     @UserData() { userId }: UserIndentifaer,
   ) {
-    return this.shoeService.updateShoe(userId, id, dto);
+    const updatedShoe = await this.shoeService.updateShoe(userId, id, dto);
+    const currentDurability = await this.shoeService.calculateDurability(id);
+
+    return Object.assign(updatedShoe, currentDurability);
   }
 
   @UseGuards(JwtAuthGuard)

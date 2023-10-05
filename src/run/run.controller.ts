@@ -11,6 +11,7 @@ import {
   Delete,
   Get,
 } from '@nestjs/common';
+import { Types } from 'mongoose';
 
 import { RunService } from './run.service';
 import { RunDto, UpdateRunDTO } from './run.dto';
@@ -19,10 +20,14 @@ import { JwtAuthGuard } from '../global/guards/jwt.guard';
 import { UserData } from '../global/decorators/user.decorator';
 import { IdValidationPipe } from '../global/pipes/id-validation.pipe';
 import { UserIndentifaer } from '../user/user.dto';
+import { ShoeService } from '../shoe/shoe.service';
 
 @Controller('run')
 export class RunController {
-  constructor(private readonly runService: RunService) {}
+  constructor(
+    private readonly runService: RunService,
+    private readonly shoeService: ShoeService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
@@ -31,7 +36,10 @@ export class RunController {
     @Body() dto: RunDto,
     @UserData() { userEmail }: UserIndentifaer,
   ) {
-    return this.runService.createRun(userEmail, dto);
+    const createdRun = await this.runService.createRun(userEmail, dto);
+    await this.shoeService.calculateDurability(dto.shoeId);
+
+    return createdRun;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -51,7 +59,10 @@ export class RunController {
     @Param('id', IdValidationPipe) id: string,
     @UserData() { userId }: UserIndentifaer,
   ) {
-    return this.runService.updateRun(userId, id, dto);
+    const updatedRun = await this.runService.updateRun(userId, id, dto);
+    await this.shoeService.calculateDurability(String(updatedRun.shoe));
+
+    return updatedRun;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -62,6 +73,9 @@ export class RunController {
     @Param('id', IdValidationPipe) id: string,
     @UserData() { userId }: UserIndentifaer,
   ) {
-    return this.runService.removeRun(userId, id);
+    const removedRun = await this.runService.removeRun(userId, id);
+    await this.shoeService.calculateDurability(String(removedRun.shoe));
+
+    return removedRun;
   }
 }
