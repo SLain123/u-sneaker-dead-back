@@ -11,7 +11,6 @@ import {
   Delete,
   Get,
 } from '@nestjs/common';
-import { Types } from 'mongoose';
 
 import { RunService } from './run.service';
 import { RunDto, UpdateRunDTO } from './run.dto';

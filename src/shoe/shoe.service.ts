@@ -96,8 +96,9 @@ export class ShoeService {
       ])
     )[0] as { currentDurability: number };
 
-    const currentDurability =
-      calculatedRuns.currentDurability + shoe.initDurability;
+    const currentDurability = calculatedRuns?.currentDurability
+      ? calculatedRuns.currentDurability + shoe.initDurability
+      : shoe.initDurability;
     const recalculatedShoe = await this.shoeModel
       .findOneAndUpdate(
         { _id: shoeId },
@@ -106,8 +107,7 @@ export class ShoeService {
         },
       )
       .exec();
-
-    if (!calculatedRuns || !recalculatedShoe) {
+    if (!recalculatedShoe) {
       throw new BadRequestException(SHOE_ERRS.shoeCalculateError);
     }
 
