@@ -23,9 +23,15 @@ export class ShoeService {
 
   async createShoe(email: string, dto: ShoeDto) {
     const user = await this.userService.findUser(email);
+
+    if (dto.initDurability >= dto.totalDurability) {
+      throw new BadRequestException(SHOE_ERRS.shoeWrongInitDurability);
+    }
+
     const newShoe = new this.shoeModel({
       ...dto,
       currentDurability: dto.initDurability,
+      active: true,
       user,
     });
     this.userService.extendUserDataList(String(user._id), newShoe, 'shoeList');
@@ -54,8 +60,8 @@ export class ShoeService {
   }
 
   async updateShoe(userId: string, shoeId: string, dto: UpdateShoeDTO) {
-    if (dto.currentDurability) {
-      throw new BadRequestException(SHOE_ERRS.shoeDurability);
+    if (dto.currentDurability || typeof dto.active !== 'undefined') {
+      throw new BadRequestException(SHOE_ERRS.shoeForbidenFields);
     }
 
     const shoe = await this.findShoe(shoeId);
@@ -99,11 +105,14 @@ export class ShoeService {
     const currentDurability = calculatedRuns?.currentDurability
       ? calculatedRuns.currentDurability + shoe.initDurability
       : shoe.initDurability;
+    const active = shoe.totalDurability > currentDurability;
+
     const recalculatedShoe = await this.shoeModel
       .findOneAndUpdate(
         { _id: shoeId },
         {
           currentDurability,
+          active,
         },
       )
       .exec();
@@ -111,6 +120,6 @@ export class ShoeService {
       throw new BadRequestException(SHOE_ERRS.shoeCalculateError);
     }
 
-    return { currentDurability };
+    return { currentDurability, active };
   }
 }

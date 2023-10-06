@@ -5,6 +5,7 @@ import {
   Max,
   IsDate,
   IsOptional,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/swagger';
@@ -33,6 +34,9 @@ export class ShoeDto {
 }
 
 export class ShoeDtoFull extends ShoeDto {
+  @IsBoolean()
+  active: boolean;
+
   @IsNumber()
   @Min(0)
   @Max(9999)

@@ -11,9 +11,10 @@ export enum USER_ERRS {
 export enum SHOE_ERRS {
   shoeNotExist = 'Shoe does not exist',
   shoeNoBelongUser = 'Shoe belongs to another user',
-  shoeDurability = 'Field current durability forbinned for changing',
+  shoeForbidenFields = 'Fields current durability and active forbinned for changing',
   shoeIdIncorrect = 'Shoe id is incorrect',
   shoeCalculateError = 'Recalculation of currentDurability was unsuccessful',
+  shoeWrongInitDurability = "Init durability couldn't be less or euals total durability",
 }
 
 export enum RUN_ERRS {

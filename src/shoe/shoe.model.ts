@@ -17,6 +17,9 @@ export class Shoe {
   desc?: string;
 
   @Prop({ required: true })
+  active: boolean;
+
+  @Prop({ required: true })
   initDurability: number;
 
   @Prop({ required: true })

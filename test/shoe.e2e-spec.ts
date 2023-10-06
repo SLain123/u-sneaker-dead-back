@@ -15,7 +15,7 @@ const testUserDto: AuthDto = {
 const testShoeDto: ShoeDto = {
   name: 'sneakers-test',
   initDurability: 0,
-  totalDurability: 3000,
+  totalDurability: 100,
   purchaseDate: new Date('1989-07-20'),
 };
 
@@ -105,6 +105,7 @@ describe('AuthController (e2e)', () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.currentDurability).toBe(0);
+        expect(body.active).toBeTruthy();
       });
 
     await request(app.getHttpServer())
@@ -119,6 +120,7 @@ describe('AuthController (e2e)', () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.currentDurability).toBe(editedDurability);
+        expect(body.active).toBeFalsy();
       });
   });
 
@@ -130,11 +132,17 @@ describe('AuthController (e2e)', () => {
       .expect(400);
   });
 
-  it('/shoe (PATCH) - fail (attempts current durability change)', () => {
-    return request(app.getHttpServer())
+  it('/shoe (PATCH) - fail (attempts current durability and active status change)', async () => {
+    await request(app.getHttpServer())
       .patch(`/shoe/${shoeId}`)
       .set('Authorization', `Bearer ${token}`)
       .send({ currentDurability: 99 })
+      .expect(400);
+
+    return request(app.getHttpServer())
+      .patch(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ active: true })
       .expect(400);
   });
 

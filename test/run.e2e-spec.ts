@@ -16,7 +16,7 @@ const testUserDto: AuthDto = {
 const testShoeDto: ShoeDto = {
   name: 'sneakers-test',
   initDurability: 0,
-  totalDurability: 3000,
+  totalDurability: 100,
   purchaseDate: new Date('1989-07-20'),
 };
 
@@ -94,6 +94,7 @@ describe('AuthController (e2e)', () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.currentDurability).toBe(10);
+        expect(body.active).toBeTruthy();
       });
 
     await request(app.getHttpServer())
@@ -111,6 +112,7 @@ describe('AuthController (e2e)', () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.currentDurability).toBe(20);
+        expect(body.active).toBeTruthy();
       });
 
     await request(app.getHttpServer())
@@ -125,6 +127,7 @@ describe('AuthController (e2e)', () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.currentDurability).toBe(110);
+        expect(body.active).toBeFalsy();
       });
 
     await request(app.getHttpServer())
@@ -138,6 +141,7 @@ describe('AuthController (e2e)', () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.currentDurability).toBe(10);
+        expect(body.active).toBeTruthy();
       });
   });
 
