@@ -52,6 +52,20 @@ export class RunController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
+  @Get(':id')
+  async getRun(
+    @Param('id', IdValidationPipe) id: string,
+    @UserData() { userId }: UserIndentifaer,
+  ) {
+    const run = await this.runService.findRun(id);
+    await this.runService.checkRunOwner(userId, String(run.user));
+
+    return run;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @UsePipes(new ValidationPipe())
   @Patch(':id')
   async updateRun(
     @Body() dto: UpdateRunDTO,

@@ -45,6 +45,20 @@ export class ShoeController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
+  @Get(':id')
+  async getShoe(
+    @Param('id', IdValidationPipe) id: string,
+    @UserData() { userId }: UserIndentifaer,
+  ) {
+    const shoe = await this.shoeService.findShoe(id);
+    await this.shoeService.checkShoeOwner(userId, String(shoe.user));
+
+    return shoe;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @UsePipes(new ValidationPipe())
   @Patch(':id')
   async updateShoe(
     @Body() dto: UpdateShoeDTO,
