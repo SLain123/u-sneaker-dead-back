@@ -97,6 +97,31 @@ describe('AuthController (e2e)', () => {
       });
   });
 
+  it('Durability chack (change init durability and check recalculated carrent durability)', async () => {
+    const editedDurability = 100;
+    await request(app.getHttpServer())
+      .get(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.currentDurability).toBe(0);
+      });
+
+    await request(app.getHttpServer())
+      .patch(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ initDurability: editedDurability })
+      .expect(200);
+
+    return request(app.getHttpServer())
+      .get(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.currentDurability).toBe(editedDurability);
+      });
+  });
+
   it('/shoe (PATCH) - fail (wrong init durability) ', () => {
     return request(app.getHttpServer())
       .patch(`/shoe/${shoeId}`)

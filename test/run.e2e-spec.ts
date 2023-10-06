@@ -177,7 +177,7 @@ describe('AuthController (e2e)', () => {
       });
   });
 
-  it('/shoe (PATCH) - success (shoe change) ', async () => {
+  it('/shoe (PATCH) - success (shoe change)', async () => {
     await request(app.getHttpServer())
       .post('/shoe/create')
       .set('Authorization', `Bearer ${token}`)
@@ -196,7 +196,7 @@ describe('AuthController (e2e)', () => {
       });
   });
 
-  it('/run (PATCH) - fail (wrong shoeId) ', () => {
+  it('/run (PATCH) - fail (wrong shoeId)', () => {
     return request(app.getHttpServer())
       .patch(`/run/${runId}`)
       .set('Authorization', `Bearer ${token}`)
@@ -212,7 +212,7 @@ describe('AuthController (e2e)', () => {
       .expect(400);
   });
 
-  it('/shoe (PATCH) - fail (wrong run owner) ', () => {
+  it('/shoe (PATCH) - fail (wrong run owner)', () => {
     return request(app.getHttpServer())
       .patch(`/run/${runId}`)
       .set('Authorization', `Bearer ${fakeToken}`)
@@ -220,7 +220,7 @@ describe('AuthController (e2e)', () => {
       .expect(401);
   });
 
-  it('/shoe (PATCH) - fail (wrong shoe owner) ', async () => {
+  it('/shoe (PATCH) - fail (wrong shoe owner)', async () => {
     let differentToken;
     let differentShoeId;
 
@@ -253,14 +253,14 @@ describe('AuthController (e2e)', () => {
       .set('Authorization', `Bearer ${differentToken}`);
   });
 
-  it('/shoe (DELETE) - fail (wrong run owner) ', () => {
+  it('/shoe (DELETE) - fail (wrong run owner)', () => {
     return request(app.getHttpServer())
       .delete(`/run/${runId}`)
       .set('Authorization', `Bearer ${fakeToken}`)
       .expect(401);
   });
 
-  it('/shoe (DELETE) - fail (wrong run id) ', () => {
+  it('/shoe (DELETE) - fail (wrong run id)', () => {
     return request(app.getHttpServer())
       .delete(`/shoe/${fakeId}`)
       .set('Authorization', `Bearer ${token}`)
