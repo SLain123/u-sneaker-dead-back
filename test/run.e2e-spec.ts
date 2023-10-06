@@ -86,6 +86,61 @@ describe('AuthController (e2e)', () => {
       .then(({ body }) => expect(body.runList).toHaveLength(1));
   });
 
+  it('Durability check (create extra run and check shoe durability, then change training distance and check durability, then remove extra run and another check)', async () => {
+    let extraRunId;
+    await request(app.getHttpServer())
+      .get(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.currentDurability).toBe(10);
+      });
+
+    await request(app.getHttpServer())
+      .post('/run/create')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testRunDto, shoeId })
+      .expect(201)
+      .then(({ body }) => {
+        extraRunId = body._id;
+      });
+
+    await request(app.getHttpServer())
+      .get(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.currentDurability).toBe(20);
+      });
+
+    await request(app.getHttpServer())
+      .patch(`/run/${extraRunId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ trDistance: 100 })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .get(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.currentDurability).toBe(110);
+      });
+
+    await request(app.getHttpServer())
+      .delete(`/run/${extraRunId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    return request(app.getHttpServer())
+      .get(`/shoe/${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.currentDurability).toBe(10);
+      });
+  });
+
   it('/run/create (POST) - fail (wrong shoeId)', () => {
     return request(app.getHttpServer())
       .post('/run/create')
@@ -100,6 +155,14 @@ describe('AuthController (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .then(({ body }) => expect(body).toHaveLength(1));
+  });
+
+  it('/run (GET) by id - success', async () => {
+    return request(app.getHttpServer())
+      .get(`/run/${runId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body.trDistance).toBe(testRunDto.trDistance));
   });
 
   it('/run (PATCH) - success (distance change)', async () => {
