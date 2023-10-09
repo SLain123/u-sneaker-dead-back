@@ -13,7 +13,7 @@ export class StatisticService {
   async getStatistic(userId: string) {
     const allUserRuns = await this.runService.findAllUserRuns(userId);
     const sumDistance = allUserRuns.reduce(
-      (acc, run) => acc + run.trDistance,
+      (acc, { trDistance }) => acc + trDistance,
       0,
     );
     const avgDistance = sumDistance / allUserRuns.length;
@@ -21,7 +21,8 @@ export class StatisticService {
     const allShoes = await this.shoeService.findAllUserShoes(userId);
     const activeShoes = allShoes.filter(({ active }) => active);
     const sumActiveDurability = activeShoes.reduce(
-      (acc, shoe) => acc + (shoe.totalDurability - shoe.currentDurability),
+      (acc, { totalDurability, currentDurability }) =>
+        acc + (totalDurability - currentDurability),
       0,
     );
 

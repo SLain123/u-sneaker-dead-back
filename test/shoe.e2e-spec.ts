@@ -8,7 +8,7 @@ import { AuthDto } from '../src/auth/auth.dto';
 import { ShoeDto } from '../src/shoe/shoe.dto';
 
 const testUserDto: AuthDto = {
-  email: 'supertest@shoe.ru',
+  email: 'supertest@run.ru',
   password: '123456',
 };
 
