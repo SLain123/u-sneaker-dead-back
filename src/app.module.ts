@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { RunModule } from './run/run.module';
 import { ShoeModule } from './shoe/shoe.module';
+import { StatisticModule } from './statistic/statistic.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ShoeModule } from './shoe/shoe.module';
     AuthModule,
     RunModule,
     ShoeModule,
+    StatisticModule,
   ],
 })
 export class AppModule {}
