@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { RunService } from '../run/run.service';
 import { ShoeService } from '../shoe/shoe.service';
+import { Run } from '../run/run.model';
 
 @Injectable()
 export class StatisticService {
@@ -30,7 +31,7 @@ export class StatisticService {
     );
 
     const sortedRuns = allUserRuns.sort(
-      (a: any, b: any) => a.trDate - b.trDate,
+      (a: Run, b: Run) => +a.trDate - +b.trDate,
     );
     if (sortedRuns.length > 1) {
       const firstRun = sortedRuns[0].trDate;
