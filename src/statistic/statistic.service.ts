@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 
 import { RunService } from '../run/run.service';
 import { ShoeService } from '../shoe/shoe.service';
 import { Run } from '../run/run.model';
+import { STAT_ERRS } from '../global/errors';
 
 @Injectable()
 export class StatisticService {
@@ -12,9 +13,6 @@ export class StatisticService {
   ) {}
 
   async getStatistic(userId: string) {
-    let avgDistansePerWeek = 0;
-    let sumActiveWeeks = 0;
-
     const allUserRuns = await this.runService.findAllUserRuns(userId);
     const sumDistance = allUserRuns.reduce(
       (acc, { trDistance }) => acc + trDistance,
@@ -33,15 +31,17 @@ export class StatisticService {
     const sortedRuns = allUserRuns.sort(
       (a: Run, b: Run) => +a.trDate - +b.trDate,
     );
-    if (sortedRuns.length > 1) {
-      const firstRun = sortedRuns[0].trDate;
-      const lastRun = sortedRuns[sortedRuns.length - 1].trDate;
-
-      sumActiveWeeks = Math.round(
-        (+lastRun - +firstRun) / (1000 * 60 * 60 * 24 * 7),
-      );
-      avgDistansePerWeek = +(sumDistance / sumActiveWeeks).toFixed(2);
+    if (sortedRuns.length < 2) {
+      throw new BadRequestException(STAT_ERRS.emptyAvgDistancePerWeek);
     }
+
+    const firstRun = sortedRuns[0].trDate;
+    const lastRun = sortedRuns[sortedRuns.length - 1].trDate;
+
+    const sumActiveWeeks = Math.round(
+      (+lastRun - +firstRun) / (1000 * 60 * 60 * 24 * 7),
+    );
+    const avgDistansePerWeek = +(sumDistance / sumActiveWeeks).toFixed(2);
 
     return {
       sumDistance, //--------------------- sum of all runs in km
@@ -52,5 +52,26 @@ export class StatisticService {
       activeShoes: activeShoes.length, //- count of active (not broken) sneakers in unit
       sumActiveDurability, //------------- rest of durability from all active sneakers in km
     };
+  }
+
+  async getBrokenDate(userId: string, shoeId: string) {
+    const shoe = await this.shoeService.findShoe(shoeId);
+    await this.shoeService.checkShoeOwner(userId, String(shoe.user));
+
+    const restDurability = shoe.totalDurability - shoe.currentDurability;
+    const { avgDistansePerWeek } = await this.getStatistic(userId);
+    if (restDurability <= 0) {
+      throw new BadRequestException(STAT_ERRS.emptyDurability);
+    }
+    if (avgDistansePerWeek <= 0) {
+      throw new BadRequestException(STAT_ERRS.emptyAvgDistancePerWeek);
+    }
+
+    const brokenDate = new Date(
+      (restDurability / avgDistansePerWeek) * 7 * 24 * 60 * 60 * 1000 +
+        +new Date(),
+    );
+
+    return brokenDate;
   }
 }

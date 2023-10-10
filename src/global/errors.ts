@@ -22,3 +22,8 @@ export enum RUN_ERRS {
   runNoBelongUser = 'Run belongs to another user',
   runShoe = 'Field shoe forbinned for direct changing, use shoeId field',
 }
+
+export enum STAT_ERRS {
+  emptyDurability = 'Shoe have empty durability',
+  emptyAvgDistancePerWeek = 'User no have enought runs for calculate average distance per week',
+}
