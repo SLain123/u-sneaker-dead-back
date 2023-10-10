@@ -27,9 +27,21 @@ const testSecondShoeDto: ShoeDto = {
   purchaseDate: new Date('1989-07-21'),
 };
 
-const testRunDto: RunDto = {
-  trDate: new Date('1989-07-20'),
+const testFirstRunDto: RunDto = {
+  trDate: new Date('2023-01-20'),
   trDistance: 10,
+  shoeId: '',
+};
+
+const testSecondRunDto: RunDto = {
+  trDate: new Date('2023-02-20'),
+  trDistance: 5,
+  shoeId: '',
+};
+
+const testThirdRunDto: RunDto = {
+  trDate: new Date('2022-11-20'),
+  trDistance: 85,
   shoeId: '',
 };
 
@@ -72,11 +84,14 @@ describe('AuthController (e2e)', () => {
     await request(app.getHttpServer())
       .get('/statistic')
       .set('Authorization', `Bearer ${token}`)
+      .expect(200)
       .then(({ body }) => {
         expect(body.sumDistance).toBe(0);
         expect(body.shoesLength).toBe(2);
         expect(body.activeShoes).toBe(2);
         expect(body.sumActiveDurability).toBe(600);
+        expect(body.sumActiveWeeks).toBe(0);
+        expect(body.avgDistansePerWeek).toBe(0);
       });
   });
 
@@ -84,24 +99,27 @@ describe('AuthController (e2e)', () => {
     await request(app.getHttpServer())
       .post('/run/create')
       .set('Authorization', `Bearer ${token}`)
-      .send({ ...testRunDto, shoeId: shoeFirstId })
+      .send({ ...testFirstRunDto, shoeId: shoeFirstId })
       .expect(201)
       .then(({ body }) => runIdList.push(body._id));
 
     await request(app.getHttpServer())
       .post('/run/create')
       .set('Authorization', `Bearer ${token}`)
-      .send({ ...testRunDto, trDistance: 5, shoeId: shoeFirstId })
+      .send({ ...testSecondRunDto, shoeId: shoeFirstId })
       .expect(201)
       .then(({ body }) => runIdList.push(body._id));
 
     await request(app.getHttpServer())
       .get('/statistic')
       .set('Authorization', `Bearer ${token}`)
+      .expect(200)
       .then(({ body }) => {
         expect(body.sumDistance).toBe(15);
-        expect(body.avgDistance).toBe(7.5);
+        expect(body.avgDistancePerRun).toBe(7.5);
         expect(body.sumActiveDurability).toBe(585);
+        expect(body.sumActiveWeeks).toBe(4);
+        expect(body.avgDistansePerWeek).toBe(3.75);
       });
   });
 
@@ -113,19 +131,22 @@ describe('AuthController (e2e)', () => {
     await request(app.getHttpServer())
       .post('/run/create')
       .set('Authorization', `Bearer ${token}`)
-      .send({ ...testRunDto, trDistance: 85, shoeId: shoeFirstId })
+      .send({ ...testThirdRunDto, shoeId: shoeFirstId })
       .expect(201)
       .then(({ body }) => runIdList.push(body._id));
 
     await request(app.getHttpServer())
       .get('/statistic')
       .set('Authorization', `Bearer ${token}`)
+      .expect(200)
       .then(({ body }) => {
         expect(body.sumDistance).toBe(100);
-        expect(+body.avgDistance.toFixed(2)).toBe(33.33);
+        expect(+body.avgDistancePerRun.toFixed(2)).toBe(33.33);
         expect(body.sumActiveDurability).toBe(0);
         expect(body.shoesLength).toBe(1);
         expect(body.activeShoes).toBe(0);
+        expect(body.sumActiveWeeks).toBe(13);
+        expect(body.avgDistansePerWeek).toBe(7.69);
       });
   });
 

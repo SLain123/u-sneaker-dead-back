@@ -11,6 +11,9 @@ export class StatisticService {
   ) {}
 
   async getStatistic(userId: string) {
+    let avgDistansePerWeek = 0;
+    let sumActiveWeeks = 0;
+
     const allUserRuns = await this.runService.findAllUserRuns(userId);
     const sumDistance = allUserRuns.reduce(
       (acc, { trDistance }) => acc + trDistance,
@@ -29,13 +32,15 @@ export class StatisticService {
     const sortedRuns = allUserRuns.sort(
       (a: any, b: any) => a.trDate - b.trDate,
     );
-    const firstRun = sortedRuns[0].trDate;
-    const lastRun = sortedRuns[sortedRuns.length - 1].trDate;
+    if (sortedRuns.length > 1) {
+      const firstRun = sortedRuns[0].trDate;
+      const lastRun = sortedRuns[sortedRuns.length - 1].trDate;
 
-    const sumActiveWeeks = Math.round(
-      (+lastRun - +firstRun) / (1000 * 60 * 60 * 24 * 7),
-    );
-    const avgDistansePerWeek = +(avgDistancePerRun / sumActiveWeeks).toFixed(2);
+      sumActiveWeeks = Math.round(
+        (+lastRun - +firstRun) / (1000 * 60 * 60 * 24 * 7),
+      );
+      avgDistansePerWeek = +(sumDistance / sumActiveWeeks).toFixed(2);
+    }
 
     return {
       sumDistance, //--------------------- sum of all runs in km
