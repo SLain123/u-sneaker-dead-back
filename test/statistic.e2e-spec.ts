@@ -81,7 +81,7 @@ describe('AuthController (e2e)', () => {
   }, 10000);
 
   it('/statistic (GET) - success (inital data after double shoe creating)', async () => {
-    await request(app.getHttpServer())
+    return request(app.getHttpServer())
       .get('/statistic')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
@@ -110,7 +110,7 @@ describe('AuthController (e2e)', () => {
       .expect(201)
       .then(({ body }) => runIdList.push(body._id));
 
-    await request(app.getHttpServer())
+    return request(app.getHttpServer())
       .get('/statistic')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
@@ -135,7 +135,7 @@ describe('AuthController (e2e)', () => {
       .expect(201)
       .then(({ body }) => runIdList.push(body._id));
 
-    await request(app.getHttpServer())
+    return request(app.getHttpServer())
       .get('/statistic')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
@@ -147,6 +147,55 @@ describe('AuthController (e2e)', () => {
         expect(body.activeShoes).toBe(0);
         expect(body.sumActiveWeeks).toBe(13);
         expect(body.avgDistansePerWeek).toBe(7.69);
+      });
+  });
+
+  it('/statistic/prediction (GET) - success (check prediction for shoe with 200km durability)', async () => {
+    const prediction = {
+      restWeeks: 13,
+      finishDate: new Date(
+        +Date.now() + 13 * (7 * 24 * 60 * 60 * 1000),
+      ).toDateString(),
+    };
+
+    await request(app.getHttpServer())
+      .patch(`/shoe/${shoeFirstId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ totalDurability: 200 })
+      .expect(200);
+
+    return request(app.getHttpServer())
+      .get(`/statistic/prediction/${shoeFirstId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.restWeeks).toBe(prediction.restWeeks);
+        expect(body.finishDate).toBe(prediction.finishDate);
+      });
+  });
+
+  it('/statistic/prediction (GET) - success (check prediction after add new run)', async () => {
+    const prediction = {
+      restWeeks: 1,
+      finishDate: new Date(
+        +Date.now() + 1 * (7 * 24 * 60 * 60 * 1000),
+      ).toDateString(),
+    };
+
+    await request(app.getHttpServer())
+      .post('/run/create')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testThirdRunDto, shoeId: shoeFirstId })
+      .expect(201)
+      .then(({ body }) => runIdList.push(body._id));
+
+    return request(app.getHttpServer())
+      .get(`/statistic/prediction/${shoeFirstId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.restWeeks).toBe(prediction.restWeeks);
+        expect(body.finishDate).toBe(prediction.finishDate);
       });
   });
 
@@ -163,5 +212,5 @@ describe('AuthController (e2e)', () => {
       .set('Authorization', `Bearer ${token}`);
 
     disconnect();
-  });
+  }, 10000);
 });

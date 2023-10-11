@@ -13,6 +13,9 @@ export class StatisticService {
   ) {}
 
   async getStatistic(userId: string) {
+    let sumActiveWeeks = 0;
+    let avgDistansePerWeek = 0;
+
     const allUserRuns = await this.runService.findAllUserRuns(userId);
     const sumDistance = allUserRuns.reduce(
       (acc, { trDistance }) => acc + trDistance,
@@ -31,17 +34,15 @@ export class StatisticService {
     const sortedRuns = allUserRuns.sort(
       (a: Run, b: Run) => +a.trDate - +b.trDate,
     );
-    if (sortedRuns.length < 2) {
-      throw new BadRequestException(STAT_ERRS.emptyAvgDistancePerWeek);
+    if (sortedRuns.length > 1) {
+      const firstRun = sortedRuns[0].trDate;
+      const lastRun = sortedRuns[sortedRuns.length - 1].trDate;
+
+      sumActiveWeeks = Math.round(
+        (+lastRun - +firstRun) / (1000 * 60 * 60 * 24 * 7),
+      );
+      avgDistansePerWeek = +(sumDistance / sumActiveWeeks).toFixed(2);
     }
-
-    const firstRun = sortedRuns[0].trDate;
-    const lastRun = sortedRuns[sortedRuns.length - 1].trDate;
-
-    const sumActiveWeeks = Math.round(
-      (+lastRun - +firstRun) / (1000 * 60 * 60 * 24 * 7),
-    );
-    const avgDistansePerWeek = +(sumDistance / sumActiveWeeks).toFixed(2);
 
     return {
       sumDistance, //--------------------- sum of all runs in km
@@ -67,11 +68,15 @@ export class StatisticService {
       throw new BadRequestException(STAT_ERRS.emptyAvgDistancePerWeek);
     }
 
+    const restWeeks = Math.floor(restDurability / avgDistansePerWeek);
     const brokenDate = new Date(
-      (restDurability / avgDistansePerWeek) * 7 * 24 * 60 * 60 * 1000 +
-        +new Date(),
+      +Date.now() + restWeeks * (7 * 24 * 60 * 60 * 1000),
     );
 
-    return brokenDate;
+    return {
+      finishDateStr: brokenDate,
+      finishDate: brokenDate.toDateString(),
+      restWeeks,
+    };
   }
 }
