@@ -12,6 +12,7 @@ import { Shoe } from './shoe.model';
 import { UserService } from '../user/user.service';
 import { SHOE_ERRS } from '../global/errors';
 import { Run } from '../run/run.model';
+import { Pagination } from '../global/pipes/pagination-params.pipe';
 
 @Injectable()
 export class ShoeService {
@@ -49,8 +50,28 @@ export class ShoeService {
   }
 
   async findAllUserShoes(userId: string) {
-    const shoeList = await this.shoeModel.find({ user: userId });
-    return shoeList;
+    return this.shoeModel.find({ user: userId });
+  }
+
+  async findAllUserShoesWithPaginate(
+    userId: string,
+    { limit, offset }: Pagination,
+    activeFilter?: 'true' | 'false',
+  ) {
+    if (activeFilter && activeFilter !== 'true' && activeFilter !== 'false') {
+      throw new BadRequestException(SHOE_ERRS.wrongActiveQuery);
+    }
+
+    let active = [true, false];
+    if (activeFilter) {
+      const isTrue = activeFilter === 'true';
+      active = [isTrue];
+    }
+
+    return this.shoeModel.find({ user: userId, active }, null, {
+      skip: offset,
+      limit,
+    });
   }
 
   async checkShoeOwner(userId: string, shoeOwnerId: string) {

@@ -15,6 +15,7 @@ export enum SHOE_ERRS {
   shoeIdIncorrect = 'Shoe id is incorrect',
   shoeCalculateError = 'Recalculation of currentDurability was unsuccessful',
   shoeWrongInitDurability = "Init durability couldn't be less or euals total durability",
+  wrongActiveQuery = 'Query param active must be true or false',
 }
 
 export enum RUN_ERRS {

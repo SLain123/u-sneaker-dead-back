@@ -79,7 +79,7 @@ describe('AuthController (e2e)', () => {
 
   it('/shoe (GET) - success', async () => {
     return request(app.getHttpServer())
-      .get('/shoe')
+      .get('/shoe/all')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .then(({ body }) => expect(body).toHaveLength(1));

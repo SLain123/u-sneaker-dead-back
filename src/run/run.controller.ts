@@ -10,6 +10,7 @@ import {
   Param,
   Delete,
   Get,
+  Query,
 } from '@nestjs/common';
 
 import { RunService } from './run.service';
@@ -20,6 +21,10 @@ import { UserData } from '../global/decorators/user.decorator';
 import { IdValidationPipe } from '../global/pipes/id-validation.pipe';
 import { UserIndentifaer } from '../user/user.dto';
 import { ShoeService } from '../shoe/shoe.service';
+import {
+  PaginationParams,
+  Pagination,
+} from '../global/pipes/pagination-params.pipe';
 
 @Controller('run')
 export class RunController {
@@ -44,9 +49,17 @@ export class RunController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
-  @Get('')
-  async getAllUserRuns(@UserData() { userId }: UserIndentifaer) {
-    return this.runService.findAllUserRuns(userId);
+  @Get('all')
+  async getAllUserRuns(
+    @UserData() { userId }: UserIndentifaer,
+    @PaginationParams() paginationParams: Pagination,
+    @Query('shoe') shoe?: string,
+  ) {
+    return this.runService.findAllUserRunsWithPaginate(
+      userId,
+      paginationParams,
+      shoe,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

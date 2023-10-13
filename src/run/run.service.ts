@@ -12,6 +12,7 @@ import { RunDto, UpdateRunDTO } from './run.dto';
 import { UserService } from '../user/user.service';
 import { RUN_ERRS, SHOE_ERRS } from '../global/errors';
 import { ShoeService } from '../shoe/shoe.service';
+import { Pagination } from '../global/pipes/pagination-params.pipe';
 
 @Injectable()
 export class RunService {
@@ -52,6 +53,24 @@ export class RunService {
       .populate('shoe')
       .exec();
     return runList;
+  }
+
+  async findAllUserRunsWithPaginate(
+    userId: string,
+    { limit, offset }: Pagination,
+    shoeFilter?: string,
+  ) {
+    let shoe = (await this.shoeService.findAllUserShoes(userId)).map(
+      (shoe) => shoe._id,
+    );
+    if (shoeFilter) {
+      shoe = [Types.ObjectId.createFromHexString(shoeFilter)];
+    }
+
+    return this.runModel.find({ user: userId, shoe }, null, {
+      skip: offset,
+      limit,
+    });
   }
 
   async checkRunOwner(userId: string, runOwnerId: string) {
