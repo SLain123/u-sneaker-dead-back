@@ -62,7 +62,7 @@ describe('AuthController (e2e)', () => {
         shoeId = body._id;
       });
 
-    await wait();
+    await wait(3000);
     return request(app.getHttpServer())
       .get('/user')
       .set('Authorization', `Bearer ${token}`)
@@ -79,10 +79,18 @@ describe('AuthController (e2e)', () => {
 
   it('/shoe (GET) - success', async () => {
     return request(app.getHttpServer())
-      .get('/shoe/all')
+      .get('/shoe/all?page=1&size=10')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .then(({ body }) => expect(body).toHaveLength(1));
+  });
+
+  it('/shoe (GET) - success (only unactive shoe)', async () => {
+    return request(app.getHttpServer())
+      .get('/shoe/all?active=false&page=1&size=10')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body).toHaveLength(0));
   });
 
   it('/shoe (PATCH) - success', async () => {

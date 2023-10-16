@@ -155,7 +155,7 @@ describe('AuthController (e2e)', () => {
 
   it('/run (GET) - success', async () => {
     return request(app.getHttpServer())
-      .get('/run')
+      .get('/run/all?page=1&size=10')
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .then(({ body }) => expect(body).toHaveLength(1));
@@ -255,6 +255,69 @@ describe('AuthController (e2e)', () => {
     return request(app.getHttpServer())
       .delete(`/shoe/${differentShoeId}`)
       .set('Authorization', `Bearer ${differentToken}`);
+  });
+
+  it('/run (GET) - success (Pagination and Filter test)', async () => {
+    let extraRunId;
+    await request(app.getHttpServer())
+      .post('/run/create')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...testRunDto, shoeId })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body._id).toBeDefined();
+        extraRunId = body._id;
+      });
+
+    await request(app.getHttpServer())
+      .get('/run/all?page=1&size=10')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body).toHaveLength(2));
+
+    await request(app.getHttpServer())
+      .get('/run/all?page=1&size=1')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body).toHaveLength(1));
+
+    await request(app.getHttpServer())
+      .get('/run/all?page=2&size=1')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body).toHaveLength(1));
+
+    await request(app.getHttpServer())
+      .get('/run/all?page=1&size=2')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body).toHaveLength(2));
+
+    await request(app.getHttpServer())
+      .get('/run/all?page=2&size=2')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body).toHaveLength(0));
+
+    await request(app.getHttpServer())
+      .get(`/run/all?page=1&size=10&shoe=${shoeId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body[0]._id).toBe(extraRunId);
+        expect(body).toHaveLength(1);
+      });
+
+    await request(app.getHttpServer())
+      .delete(`/run/${extraRunId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    return request(app.getHttpServer())
+      .get('/run/all?page=1&size=10')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .then(({ body }) => expect(body).toHaveLength(1));
   });
 
   it('/shoe (DELETE) - fail (wrong run owner)', () => {
