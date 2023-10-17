@@ -8,3 +8,14 @@ export class AuthDto {
   @IsString()
   password: string;
 }
+
+export class GoogleUserData {
+  @IsString()
+  id: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  nick: string;
+}

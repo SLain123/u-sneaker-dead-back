@@ -6,6 +6,7 @@ export enum USER_ERRS {
   userNotExist = 'User does not exist',
   uncorrectPassword = 'Password is not correct',
   prohibitedData = 'Email, password or shoe/run lists prohibited for modification via this route',
+  googleUserNotFound = 'User was not received from the Google service',
 }
 
 export enum SHOE_ERRS {

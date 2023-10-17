@@ -8,11 +8,14 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Req,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Types } from 'mongoose';
 
 import { AuthService } from './auth.service';
 import { AUTH_ERRS } from '../global/errors';
-import { AuthDto } from './auth.dto';
+import { AuthDto, GoogleUserData } from './auth.dto';
 
 import { UserService } from '../user/user.service';
 import { UserIndentifaer, UserDto } from '../user/user.dto';
@@ -55,5 +58,37 @@ export class AuthController {
   @Get('check')
   async check(@UserData() userData: UserIndentifaer) {
     return userData;
+  }
+
+  @Get('gauth')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth() {}
+
+  @Get('gredirect')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req: { user?: GoogleUserData }) {
+    const googleUser = await this.authService.googleLogin(req);
+
+    let currentUser = await this.userService.findUser(
+      googleUser.user.email,
+      true,
+    );
+    if (!currentUser) {
+      const userDto = {
+        email: googleUser.user.email,
+        password: String(new Types.ObjectId()),
+        weight: 60,
+        nick: googleUser.user.nick,
+      };
+      await this.userService.createUser(userDto);
+    }
+
+    currentUser = await this.userService.findUser(googleUser.user.email);
+    const token = await this.authService.login({
+      userId: String(currentUser._id),
+      userEmail: currentUser.email,
+    });
+
+    return token;
   }
 }
