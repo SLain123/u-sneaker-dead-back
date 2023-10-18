@@ -12,6 +12,7 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { ShoeDto, UpdateShoeDTO } from './shoe.dto';
 import { ShoeService } from './shoe.service';
@@ -25,6 +26,7 @@ import {
 } from '../global/pipes/pagination-params.pipe';
 import { UserIndentifaer } from '../user/user.dto';
 
+@ApiTags('Shoes')
 @Controller('shoe')
 export class ShoeController {
   constructor(private readonly shoeService: ShoeService) {}

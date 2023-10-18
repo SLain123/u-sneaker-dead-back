@@ -12,6 +12,7 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { RunService } from './run.service';
 import { RunDto, UpdateRunDTO } from './run.dto';
@@ -26,6 +27,7 @@ import {
   Pagination,
 } from '../global/pipes/pagination-params.pipe';
 
+@ApiTags('Runs')
 @Controller('run')
 export class RunController {
   constructor(

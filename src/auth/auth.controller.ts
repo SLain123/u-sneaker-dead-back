@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Types } from 'mongoose';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { AUTH_ERRS } from '../global/errors';
@@ -21,7 +22,9 @@ import { UserService } from '../user/user.service';
 import { UserIndentifaer, UserDto } from '../user/user.dto';
 import { JwtAuthGuard } from '../global/guards/jwt.guard';
 import { UserData } from '../global/decorators/user.decorator';
+import { ProviderType } from '../user/user.model';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -37,7 +40,7 @@ export class AuthController {
       throw new BadRequestException(AUTH_ERRS.userExists);
     }
 
-    return this.userService.createUser(dto, 'local');
+    return this.userService.createUser(dto, ProviderType.local);
   }
 
   @UsePipes(new ValidationPipe())
@@ -80,7 +83,7 @@ export class AuthController {
         weight: 60,
         nick: googleUser.user.nick,
       };
-      await this.userService.createUser(userDto, 'google');
+      await this.userService.createUser(userDto, ProviderType.google);
     }
 
     currentUser = await this.userService.findUser(googleUser.user.email);

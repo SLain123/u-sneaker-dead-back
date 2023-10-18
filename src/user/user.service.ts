@@ -20,7 +20,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  async createUser(dto: UserDto, provider: ProviderType = 'local') {
+  async createUser(dto: UserDto, provider: ProviderType = ProviderType.local) {
     const { email, password, weight, nick = '' } = dto;
     const salt = await genSalt(10);
     const newUser = new this.userModel({
@@ -31,7 +31,14 @@ export class UserService {
       provider,
     });
 
-    return newUser.save();
+    const createdUser = await newUser.save();
+
+    return {
+      _id: createdUser._id,
+      email: createdUser.email,
+      nick: createdUser.nick,
+      weight: createdUser.weight,
+    };
   }
 
   async removeUser(email: string) {
@@ -40,7 +47,7 @@ export class UserService {
       throw new UnauthorizedException(USER_ERRS.userNotExist);
     }
 
-    return user;
+    return user.email;
   }
 
   async findUser(email: string, ignoreExisting = false) {
@@ -78,7 +85,12 @@ export class UserService {
       throw new UnauthorizedException(USER_ERRS.userNotExist);
     }
 
-    return updatedUser;
+    return {
+      _id: updatedUser._id,
+      email: updatedUser.email,
+      nick: updatedUser.nick,
+      weight: updatedUser.weight,
+    };
   }
 
   async extendUserDataList(

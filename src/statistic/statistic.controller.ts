@@ -7,6 +7,7 @@ import {
   Get,
   Param,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { StatisticService } from './statistic.service';
 
@@ -16,6 +17,7 @@ import { IdValidationPipe } from '../global/pipes/id-validation.pipe';
 
 import { UserIndentifaer } from '../user/user.dto';
 
+@ApiTags('Statistic')
 @Controller('statistic')
 export class StatisticController {
   constructor(private readonly statisticService: StatisticService) {}
