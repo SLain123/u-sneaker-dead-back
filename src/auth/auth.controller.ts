@@ -37,7 +37,7 @@ export class AuthController {
       throw new BadRequestException(AUTH_ERRS.userExists);
     }
 
-    return this.userService.createUser(dto);
+    return this.userService.createUser(dto, 'local');
   }
 
   @UsePipes(new ValidationPipe())
@@ -80,7 +80,7 @@ export class AuthController {
         weight: 60,
         nick: googleUser.user.nick,
       };
-      await this.userService.createUser(userDto);
+      await this.userService.createUser(userDto, 'google');
     }
 
     currentUser = await this.userService.findUser(googleUser.user.email);

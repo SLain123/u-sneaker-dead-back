@@ -7,7 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { genSalt, hash, compare } from 'bcryptjs';
 
-import { User } from './user.model';
+import { User, ProviderType } from './user.model';
 import { UserDto, UpdateUserDTO } from './user.dto';
 
 import { USER_ERRS } from '../global/errors';
@@ -20,7 +20,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  async createUser(dto: UserDto) {
+  async createUser(dto: UserDto, provider: ProviderType = 'local') {
     const { email, password, weight, nick = '' } = dto;
     const salt = await genSalt(10);
     const newUser = new this.userModel({
@@ -28,6 +28,7 @@ export class UserService {
       password: await hash(password, salt),
       weight,
       nick,
+      provider,
     });
 
     return newUser.save();

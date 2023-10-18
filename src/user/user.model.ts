@@ -15,6 +15,8 @@ export enum LangType {
   'rus',
 }
 
+export type ProviderType = 'local' | 'google';
+
 @Schema()
 export class User {
   @Prop({ required: true, unique: true })
@@ -40,6 +42,9 @@ export class User {
 
   @Prop([{ type: MSchema.Types.ObjectId, ref: 'Run' }])
   runList: Run[];
+
+  @Prop({ required: true })
+  provider: ProviderType;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
