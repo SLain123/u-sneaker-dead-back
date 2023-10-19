@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Types } from 'mongoose';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { AUTH_ERRS } from '../global/errors';
@@ -34,6 +34,7 @@ export class AuthController {
 
   @UsePipes(new ValidationPipe())
   @Post('register')
+  @ApiOperation({ summary: 'Creates user profile' })
   async register(@Body() dto: UserDto) {
     const oldUser = await this.userService.findUser(dto.email, true);
     if (oldUser) {
@@ -46,6 +47,7 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Post('login')
+  @ApiOperation({ summary: 'Returns user token by login and password' })
   async login(@Body() dto: AuthDto) {
     const { email, password } = dto;
     const { userId, userEmail } = await this.userService.validateUser(
@@ -59,16 +61,23 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Get('check')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Returns user id and email by token' })
   async check(@UserData() userData: UserIndentifaer) {
     return userData;
   }
 
-  @Get('gauth')
   @UseGuards(AuthGuard('google'))
+  @Get('gauth')
+  @ApiOperation({ summary: 'Executes redirect to google auth page' })
   async googleAuth() {}
 
-  @Get('gredirect')
   @UseGuards(AuthGuard('google'))
+  @Get('gredirect')
+  @ApiOperation({
+    summary:
+      'Returns user token after redirect of google auth (creates user profile or login it)',
+  })
   async googleAuthRedirect(@Req() req: { user?: GoogleUserData }) {
     const googleUser = await this.authService.googleLogin(req);
 

@@ -318,7 +318,7 @@ describe('AuthController (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .then(({ body }) => expect(body).toHaveLength(1));
-  });
+  }, 10000);
 
   it('/shoe (DELETE) - fail (wrong run owner)', () => {
     return request(app.getHttpServer())

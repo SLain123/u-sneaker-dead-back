@@ -37,6 +37,8 @@ export class UserController {
       weight: user.weight,
       runList: user.runList,
       shoeList: user.shoeList,
+      theme: user.theme,
+      lang: user.lang,
     };
   }
 

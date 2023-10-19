@@ -12,7 +12,12 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 import { RunService } from './run.service';
 import { RunDto, UpdateRunDTO } from './run.dto';
@@ -26,6 +31,7 @@ import {
   PaginationParams,
   Pagination,
 } from '../global/pipes/pagination-params.pipe';
+import { PaginationDTO } from '../global/dto/pagination.dto';
 
 @ApiTags('Runs')
 @Controller('run')
@@ -38,6 +44,8 @@ export class RunController {
   @UseGuards(JwtAuthGuard)
   @UsePipes(new ValidationPipe())
   @Post('create')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Creates run and returns it' })
   async create(
     @Body() dto: RunDto,
     @UserData() { userEmail }: UserIndentifaer,
@@ -52,6 +60,14 @@ export class RunController {
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @Get('all')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Returns all user runs' })
+  @ApiQuery({ type: PaginationDTO })
+  @ApiQuery({
+    name: 'shoe',
+    required: false,
+    description: 'Shoe id used on workout',
+  })
   async getAllUserRuns(
     @UserData() { userId }: UserIndentifaer,
     @PaginationParams() paginationParams: Pagination,
@@ -68,6 +84,8 @@ export class RunController {
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @Get(':id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Returns run data by id' })
   async getRun(
     @Param('id', IdValidationPipe) id: string,
     @UserData() { userId }: UserIndentifaer,
@@ -82,6 +100,8 @@ export class RunController {
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @Patch(':id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Allows change run data' })
   async updateRun(
     @Body() dto: UpdateRunDTO,
     @Param('id', IdValidationPipe) id: string,
@@ -97,6 +117,8 @@ export class RunController {
   @HttpCode(200)
   @UsePipes(new ValidationPipe())
   @Delete(':id')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Removes run by id and return it' })
   async removeRun(
     @Param('id', IdValidationPipe) id: string,
     @UserData() { userId }: UserIndentifaer,

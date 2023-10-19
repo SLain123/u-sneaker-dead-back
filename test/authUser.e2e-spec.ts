@@ -148,7 +148,7 @@ describe('AuthUserControllers (e2e)', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200)
       .then(({ body }) => {
-        expect(body.email).toEqual(testUserDto.email);
+        expect(body).toEqual(testUserDto.email);
       });
   });
 
